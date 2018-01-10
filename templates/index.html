@@ -1,0 +1,138 @@
+<!doctype html>
+<head>
+  <title>VIA Project - sheet-loader</title>
+  <script src='static/auto_submit.js'></script>
+	<script src='static/Chart.min.js'></script>
+	<style>
+	table.box {
+		border-collapse: collapse;
+		margin-left:auto;
+		margin-right:auto;
+	}
+  canvas{
+    display: block;
+    margin: 0px auto;
+  }
+	</style>
+
+</head>
+</body>
+<img style="margin:0px auto;display:block" src="static/logo.jpg"/>
+
+<table class="box">
+<tr><td>
+<form action="{{ url_for('load') }}" method="post" id="form">
+ <input id="hz" type="radio" name="data" value="hz"> Magnetic Flux Density
+ <input id="gzz" type="radio" name="data" value="gzz"> Gradient
+ <input type="submit" value="Submit">
+</form>
+</table>
+
+<!-- <script>
+radiobtn = document.getElementById("hz");
+radiobtn.checked = true;
+</script> -->
+
+{% if valType is defined %}
+<script>
+radiobtn = document.getElementById("{{valType}}");
+radiobtn.checked = true;
+</script>
+{% else %}
+<script>
+radiobtn = document.getElementById("hz");
+radiobtn.checked = true;
+</script>
+{% endif %}
+
+<canvas id="myChart" width="600" height="400"></canvas>
+
+<script>
+      // Global parameters:
+      // do not resize the chart canvas when its container does (keep at 600x400px)
+      Chart.defaults.global.responsive = false;
+
+      // define the chart data
+      var chartData = {
+        labels : [{% for item in labels %}
+                   "{{item}}",
+                  {% endfor %}],
+        datasets: [{
+          label: '{{ legend }}',
+          yAxisID: 'A',
+          data : [{% for item in values %}
+                    {{item}},
+                  {% endfor %}],
+          spanGaps: false,
+          fill: false,
+          lineTension: 0.1,
+          backgroundColor: "rgba(75,192,192,1)",
+          borderColor: "rgba(75,192,192,1)",
+          borderCapStyle: 'butt',
+          borderDash: [],
+          borderDashOffset: 0.0,
+          borderJoinStyle: 'miter',
+          pointBorderColor: "rgba(75,192,192,1)",
+          pointBackgroundColor: "#fff",
+          pointBorderWidth: 1,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: "rgba(75,192,192,1)",
+          pointHoverBorderColor: "rgba(220,220,220,1)",
+          pointHoverBorderWidth: 2,
+          pointRadius: 1,
+          pointHitRadius: 10,
+        }, {
+          label: 'Temperature [Celsius]',
+          yAxisID: 'B',
+          data : [{% for item in temps %}
+                    {{item}},
+                  {% endfor %}],
+          spanGaps: false,
+          fill: false,
+          lineTension: 0.1,
+          backgroundColor: "rgba(217,83,79,0.75)",
+          borderColor: "rgba(217,83,79,0.75)",
+          borderCapStyle: 'butt',
+          borderDash: [],
+          borderDashOffset: 0.0,
+          borderJoinStyle: 'miter',
+          pointBorderColor: "rgba(75,192,192,1)",
+          pointBackgroundColor: "#fff",
+          pointBorderWidth: 1,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: "rgba(75,192,192,1)",
+          pointHoverBorderColor: "rgba(220,220,220,1)",
+          pointHoverBorderWidth: 2,
+          pointRadius: 1,
+          pointHitRadius: 10,
+        }]
+      }
+
+      // get chart canvas
+      var ctx = document.getElementById("myChart").getContext("2d");
+
+      // create the chart using the chart canvas
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+          scales: {
+            yAxes: [{
+              id: 'A',
+              type: 'linear',
+              position: 'left',
+              gridLines: { color: "rgba(75,192,192,1)" },
+              ticks: { fontColor: "rgba(75,192,192,1)" },
+            }, {
+              id: 'B',
+              type: 'linear',
+              position: 'right',
+              gridLines: { color: "rgba(217,83,79,0.75)" },
+              ticks: { fontColor: "rgba(217,83,79,0.75)" },
+            }]
+          }
+        }
+      });
+</script>
+
+<body>
